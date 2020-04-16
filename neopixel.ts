@@ -67,6 +67,70 @@ namespace neopixel {
             this.show();
         }
 
+        /**
+         * Shows a rainbow pattern on all LEDs. 
+         * @param startHue the start hue value for the rainbow, eg: 1
+         * @param endHue the end hue value for the rainbow, eg: 360
+         */
+        //% blockId="neopixel_set_strip_rainbow" block="%strip|show rainbow from %startHue|to %endHue" 
+        //% weight=85 blockGap=8
+        //% parts="neopixel"
+        showRainbow(startHue: number = 1, endHue: number = 360) {
+            if (this._length <= 0) return;
+
+            startHue = startHue >> 0;
+            endHue = endHue >> 0;
+            const saturation = 100;
+            const luminance = 50;
+            const steps = this._length;
+            const direction = HueInterpolationDirection.Clockwise;
+
+            //hue
+            const h1 = startHue;
+            const h2 = endHue;
+            const hDistCW = ((h2 + 360) - h1) % 360;
+            const hStepCW = Math.idiv((hDistCW * 100), steps);
+            const hDistCCW = ((h1 + 360) - h2) % 360;
+            const hStepCCW = Math.idiv(-(hDistCCW * 100), steps);
+            let hStep: number;
+            if (direction === HueInterpolationDirection.Clockwise) {
+                hStep = hStepCW;
+            } else if (direction === HueInterpolationDirection.CounterClockwise) {
+                hStep = hStepCCW;
+            } else {
+                hStep = hDistCW < hDistCCW ? hStepCW : hStepCCW;
+            }
+            const h1_100 = h1 * 100; //we multiply by 100 so we keep more accurate results while doing interpolation
+
+            //sat
+            const s1 = saturation;
+            const s2 = saturation;
+            const sDist = s2 - s1;
+            const sStep = Math.idiv(sDist, steps);
+            const s1_100 = s1 * 100;
+
+            //lum
+            const l1 = luminance;
+            const l2 = luminance;
+            const lDist = l2 - l1;
+            const lStep = Math.idiv(lDist, steps);
+            const l1_100 = l1 * 100
+
+            //interpolate
+            if (steps === 1) {
+                this.setPixelColor(0, hsl(h1 + hStep, s1 + sStep, l1 + lStep))
+            } else {
+                this.setPixelColor(0, hsl(startHue, saturation, luminance));
+                for (let i = 1; i < steps - 1; i++) {
+                    const h = Math.idiv((h1_100 + i * hStep), 100) + 360;
+                    const s = Math.idiv((s1_100 + i * sStep), 100);
+                    const l = Math.idiv((l1_100 + i * lStep), 100);
+                    this.setPixelColor(i, hsl(h, s, l));
+                }
+                this.setPixelColor(steps - 1, hsl(endHue, saturation, luminance));
+            }
+            this.show();
+        }
 
 
         /**
@@ -83,6 +147,17 @@ namespace neopixel {
             this.setPixelRGB(pixeloffset >> 0, rgb >> 0);
         }
 
+        /**
+         * Sets the number of pixels in a matrix shaped strip
+         * @param width number of pixels in a row
+         */
+        //% blockId=neopixel_set_matrix_width block="%strip|set matrix width %width"
+        //% blockGap=8
+        //% weight=5
+        //% parts="neopixel" advanced=true
+        setMatrixWidth(width: number) {
+            this._matrixWidth = Math.min(this._length, width >> 0);
+        }
 
 
 
@@ -98,6 +173,7 @@ namespace neopixel {
 
         /**
          * Turn off all LEDs.
+         * You need to call ``show`` to make the changes visible.
          */
         //% blockId="neopixel_clear" block="%strip|clear"
         //% weight=76
@@ -105,7 +181,6 @@ namespace neopixel {
         clear(): void {
             const stride = this._mode === NeoPixelMode.RGBW ? 4 : 3;
             this.buf.fill(0, this.start * stride, this._length * stride);
-			this.show();
         }
 
         /**
@@ -152,7 +227,33 @@ namespace neopixel {
             return strip;
         }
 
+        /**
+         * Shift LEDs forward and clear with zeros.
+         * You need to call ``show`` to make the changes visible.
+         * @param offset number of pixels to shift forward, eg: 1
+         */
+        //% blockId="neopixel_shift" block="%strip|shift pixels by %offset" blockGap=8
+        //% weight=40
+        //% parts="neopixel"
+        shift(offset: number = 1): void {
+            offset = offset >> 0;
+            const stride = this._mode === NeoPixelMode.RGBW ? 4 : 3;
+            this.buf.shift(-offset * stride, this.start * stride, this._length * stride)
+        }
 
+        /**
+         * Rotate LEDs forward.
+         * You need to call ``show`` to make the changes visible.
+         * @param offset number of pixels to rotate forward, eg: 1
+         */
+        //% blockId="neopixel_rotate" block="%strip|rotate pixels by %offset" blockGap=8
+        //% weight=39
+        //% parts="neopixel"
+        rotate(offset: number = 1): void {
+            offset = offset >> 0;
+            const stride = this._mode === NeoPixelMode.RGBW ? 4 : 3;
+            this.buf.rotate(-offset * stride, this.start * stride, this._length * stride)
+        }
 
         /**
          * Set the pin where the neopixel is connected, defaults to P0.
