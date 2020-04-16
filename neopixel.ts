@@ -54,6 +54,8 @@ namespace neopixel {
         _mode: NeoPixelMode;
         _matrixWidth: number; // number of leds in a matrix - if any
 
+        
+        
         /**
          * Shows all LEDs to a given color (range 0-255 for r, g, b). 
          * @param rgb RGB color of the LED
@@ -67,32 +69,6 @@ namespace neopixel {
             this.show();
         }
 
-
-        /**
-         * Set LED to a given color (range 0-255 for r, g, b). 
-         * You need to call ``show`` to make the changes visible.
-         * @param pixeloffset position of the NeoPixel in the strip
-         * @param rgb RGB color of the LED
-         */
-        //% blockId="neopixel_set_pixel_color" block="%strip|set pixel color at %pixeloffset|to %rgb=neopixel_colors" 
-        //% blockGap=8
-        //% weight=80
-        //% parts="neopixel" advanced=true
-        setPixelColor(pixeloffset: number, rgb: number): void {
-            this.setPixelRGB(pixeloffset >> 0, rgb >> 0);
-        }
-
-        /**
-         * Sets the number of pixels in a matrix shaped strip
-         * @param width number of pixels in a row
-         */
-        //% blockId=neopixel_set_matrix_width block="%strip|set matrix width %width"
-        //% blockGap=8
-        //% weight=5
-        //% parts="neopixel" advanced=true
-        setMatrixWidth(width: number) {
-            this._matrixWidth = Math.min(this._length, width >> 0);
-        }
 
 
 
@@ -119,14 +95,6 @@ namespace neopixel {
             this.show();
         }
 
-        /**
-         * Gets the number of pixels declared on the strip
-         */
-        //% blockId="neopixel_length" block="%strip|length" blockGap=8
-        //% weight=60 advanced=true
-        length() {
-            return this._length;
-        }
 
         /**
          * Set the brightness of the strip. This flag only applies to future operation.
@@ -134,7 +102,7 @@ namespace neopixel {
          */
         //% blockId="neopixel_set_brightness" block="%strip|set brightness %brightness" blockGap=8
         //% weight=59
-        //% parts="neopixel" advanced=true
+        //% parts="neopixel"
         setBrightness(brightness: number): void {
             this.brightness = brightness & 0xff;
         }
@@ -143,7 +111,7 @@ namespace neopixel {
         /** 
          * Create a range of LEDs.
          * @param start offset in the LED strip to start the range
-         * @param length number of LEDs in the range. eg: 4
+         * @param length number of LEDs in the range. eg: 1
          */
         //% weight=89
         //% blockId="neopixel_range" block="%strip|range from %start|with %length|leds"
@@ -163,33 +131,7 @@ namespace neopixel {
             return strip;
         }
 
-        /**
-         * Shift LEDs forward and clear with zeros.
-         * You need to call ``show`` to make the changes visible.
-         * @param offset number of pixels to shift forward, eg: 1
-         */
-        //% blockId="neopixel_shift" block="%strip|shift pixels by %offset" blockGap=8
-        //% weight=40
-        //% parts="neopixel"
-        shift(offset: number = 1): void {
-            offset = offset >> 0;
-            const stride = this._mode === NeoPixelMode.RGBW ? 4 : 3;
-            this.buf.shift(-offset * stride, this.start * stride, this._length * stride)
-        }
 
-        /**
-         * Rotate LEDs forward.
-         * You need to call ``show`` to make the changes visible.
-         * @param offset number of pixels to rotate forward, eg: 1
-         */
-        //% blockId="neopixel_rotate" block="%strip|rotate pixels by %offset" blockGap=8
-        //% weight=39
-        //% parts="neopixel"
-        rotate(offset: number = 1): void {
-            offset = offset >> 0;
-            const stride = this._mode === NeoPixelMode.RGBW ? 4 : 3;
-            this.buf.rotate(-offset * stride, this.start * stride, this._length * stride)
-        }
 
         /**
          * Set the pin where the neopixel is connected, defaults to P0.
@@ -288,7 +230,7 @@ namespace neopixel {
     /**
      * Create a new NeoPixel driver for `numleds` LEDs.
      * @param pin the pin where the neopixel is connected.
-     * @param numleds number of leds in the strip, eg: 24,30,60,64
+     * @param numleds number of leds in the strip, eg: 2,24
      */
     //% blockId="neopixel_create" block="NeoPixel at pin %pin|with %numleds|leds as %mode"
     //% weight=90 blockGap=8
