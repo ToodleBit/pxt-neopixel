@@ -173,7 +173,7 @@ namespace neopixel {
 
         /**
          * Turn off all LEDs.
-         * You need to call ``show`` to make the changes visible.
+         * Turn off lower LEDs.
          */
         //% blockId="neopixel_clear" block="%strip|clear"
         //% weight=76
@@ -181,6 +181,7 @@ namespace neopixel {
         clear(): void {
             const stride = this._mode === NeoPixelMode.RGBW ? 4 : 3;
             this.buf.fill(0, this.start * stride, this._length * stride);
+            this.show();
         }
 
         /**
