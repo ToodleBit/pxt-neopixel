@@ -172,7 +172,6 @@ namespace neopixel {
         }
 
         /**
-         * Turn off all LEDs.
          * Turn off lower LEDs.
          */
         //% blockId="neopixel_clear" block="%strip|clear"
